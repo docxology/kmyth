@@ -11,3 +11,6 @@
 
 test/data/*
 .vscode
+
+# Built seal/unseal binaries — build artifacts, not source
+bin/

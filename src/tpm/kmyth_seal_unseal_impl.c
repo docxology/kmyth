@@ -348,8 +348,24 @@ int tpm2_kmyth_seal(uint8_t * input,
   // Clean-up:
   //   - done with unencrypted wrapping key (now have sealed version)
   //   - done with authVal
+  //   - flush transient objects (storage key) to free TPM object slots
   kmyth_clear_and_free(wrapKey, wrapKey_size);
   kmyth_clear(objAuthVal.buffer, objAuthVal.size);
+
+  // Flush the storage key transient object to free the TPM slot
+  if (storageKey_handle != 0)
+  {
+    TSS2_RC flush_rc = Tss2_Sys_FlushContext(sapi_ctx, storageKey_handle);
+    if (flush_rc != TSS2_RC_SUCCESS)
+    {
+      kmyth_log(LOG_WARNING, "failed to flush storage key handle 0x%08X: 0x%08X",
+                storageKey_handle, flush_rc);
+    }
+    else
+    {
+      kmyth_log(LOG_DEBUG, "flushed storage key handle 0x%08X", storageKey_handle);
+    }
+  }
 
   if (create_ski_bytes(ski, output, output_len))
   {
