@@ -396,3 +396,21 @@ file in the ramfs RAM file system. We do not recommend the tmpfs RAM file
 system, because tmpfs may use swap space.
 
 
+## Downstream template integration corrections
+
+The template integration retains the source baseline at
+`cb23c6d94423cbe4f5ef0caf23594d1095ddde79`, with three bounded corrections:
+
+- The missing-SRK/no-capacity error message has no format conversion requiring
+  a nonexistent argument.
+- SGX release C flags update `SGX_COMMON_CFLAGS`, as the debug and prerelease
+  branches already do. Release remains `-DNDEBUG -UEDEBUG -UDEBUG`; debug and
+  prerelease keep their distinct definitions.
+- `TEST_NETWORK_HEADERS` selects the headers under `TEST_NETWORK_INC_DIR`,
+  independently of the utility-header directory.
+
+GNU make variable probes can verify the last two software contracts without
+an SGX SDK, enclave or TPM. A compiler format check of the actual TPM source
+can verify the logging call's argument contract. These checks do not establish
+TPM error-path execution, key-operation correctness or SGX hardware acceptance.
+
